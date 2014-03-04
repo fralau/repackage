@@ -1,0 +1,132 @@
+""" 
+
+Repackaging module
+(C) Laurent Franceschetti 2014
+
+Changes the default directory for paths, so as to avoid
+the relative path.
+
+Use this when you move the file into a subdirectory and don't want
+to rewrite the import statements.
+
+If you have:
+Parent
+   |--a.py
+   |--mydir1
+   |  |--b.py
+   |  |--mydir12
+   |     |--c.py
+   |--mydir2
+      |--d.py
+
+Just dump this module in mydir1 and call:
+
+    import repackage
+    repackage.up()
+
+From then on, you can access a.py as if it was in the local directory.
+
+
+Note:
+    If you are in mydir12, the root is 2 levels up, add this call :
+        repackage.up(2)
+
+    You can call d.py in the following way:
+        mydir2.d
+
+
+If you are unsure what the situation is, call the lib_path function, which
+returns the current path list:
+    a = repackage.lib_path()
+
+"""
+
+from __future__ import print_function
+
+
+import sys
+import os
+
+from os.path import dirname, abspath, normpath, join
+
+import inspect
+
+
+
+
+def __caller():
+    "Filename of the caller"
+    # you have to add 2 to the stack
+    try:
+        return inspect.stack()[3][1]
+    except IndexError:
+        # called from command line
+        return ""
+        
+def __caller_path():
+    "The path of the directory of the caller"
+    if __caller <> '':
+        return dirname(abspath(__caller()))
+    else:
+        # command line
+        return os.getcwd()
+
+
+# flag to remove the default
+default_dir = False
+
+# print("Caller:", caller)
+
+
+
+def up(stepup = 1):
+    """Go up n levels (removes the previously added 1st level level path).
+    """
+
+   
+    # get directory of file from which this module was loaded
+    source_path = __caller_path()  
+    
+    for i in range(stepup):
+       # one directory up
+       source_path = dirname(source_path)
+    
+    
+    sys.path.append(source_path)
+    return source_path
+
+
+
+
+
+def add(relative_path):
+    "Adds a directory from a relative path (from the caller file)"
+    
+    # join the caller path and the relative_path, and then normalize:
+    new_path = normpath(join(__caller_path(), relative_path))
+    sys.path.append(new_path)
+    return new_path
+    
+
+
+def lib_path():
+    "Get the current paths"
+    return sys.path
+
+
+
+
+
+# --------------------------------------------
+# Testing part
+# --------------------------------------------
+if __name__ == '__main__':
+   from pprint import pprint
+   up(1)
+   print("Directory is:")
+   pprint(lib_path())
+   
+   print("Calling upper directory:")
+   up(2)
+   pprint(lib_path())
+    
