@@ -1,3 +1,4 @@
+README
 setup.py
 repackage/__init__.py
 repackage.egg-info/PKG-INFO

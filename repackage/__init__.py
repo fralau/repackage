@@ -3,8 +3,7 @@
 Repackaging module
 (C) Laurent Franceschetti 2014
 
-Changes the default directory for paths, so as to avoid
-the relative path.
+Calls a package in any directory, with a relative path.
 
 Use this when you move the file into a subdirectory and don't want
 to rewrite the import statements.
@@ -26,7 +25,6 @@ Just dump this module in mydir1 and call:
 
 From then on, you can access a.py as if it was in the local directory.
 
-
 Note:
     If you are in mydir12, the root is 2 levels up, add this call :
         repackage.up(2)
@@ -34,6 +32,10 @@ Note:
     You can call d.py in the following way:
         mydir2.d
 
+
+You can also call it this way:
+    import repackage
+    repackage.add(../../other_dir/mypackage)
 
 If you are unsure what the situation is, call the lib_path function, which
 returns the current path list:
@@ -104,8 +106,12 @@ def add(relative_path):
     
     # join the caller path and the relative_path, and then normalize:
     new_path = normpath(join(__caller_path(), relative_path))
-    sys.path.append(new_path)
-    return new_path
+    if os.path.exists(new_path):
+        sys.path.append(new_path)
+        return new_path
+    else:
+        # fail noisily
+        raise ImportError, "Directory " + new_path + " does not exist."
     
 
 
