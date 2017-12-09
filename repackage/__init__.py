@@ -1,12 +1,16 @@
-""" 
+"""
 
 Repackaging module
-(C) Laurent Franceschetti 2014
+(C) Laurent Franceschetti 2014, 2017
 
 Calls a package in any directory, with a relative path.
 
 Use this when you move the file into a subdirectory and don't want
 to rewrite the import statements.
+
+NEW: *It inserts the directory at the beginning of the list of available ones,
+so as to give precedence to the packages in that directory
+over other ones with the same name.*
 
 If you have:
 Parent
@@ -64,10 +68,10 @@ def __caller():
     except IndexError:
         # called from command line
         return ""
-        
+
 def __caller_path():
     "The path of the directory of the caller"
-    if __caller <> '':
+    if __caller != '':
         return dirname(abspath(__caller()))
     else:
         # command line
@@ -82,19 +86,20 @@ default_dir = False
 
 
 def up(stepup = 1):
-    """Go up n levels (removes the previously added 1st level level path).
+    """
+    Go up n levels (removes the previously added 1st level level path).
     """
 
-   
+
     # get directory of file from which this module was loaded
-    source_path = __caller_path()  
-    
+    source_path = __caller_path()
+
     for i in range(stepup):
        # one directory up
        source_path = dirname(source_path)
-    
-    
-    sys.path.append(source_path)
+
+    # add at the beginning:
+    sys.path.insert(0, source_path)
     return source_path
 
 
@@ -103,16 +108,17 @@ def up(stepup = 1):
 
 def add(relative_path):
     "Adds a directory from a relative path (from the caller file)"
-    
+
     # join the caller path and the relative_path, and then normalize:
     new_path = normpath(join(__caller_path(), relative_path))
     if os.path.exists(new_path):
-        sys.path.append(new_path)
+        # add at the beginning:
+        sys.path.insert(0, new_path)
         return new_path
     else:
         # fail noisily
-        raise ImportError, "Directory " + new_path + " does not exist."
-    
+        raise ImportError("Directory %s does not exist." % new_path)
+
 
 
 def lib_path():
@@ -131,8 +137,7 @@ if __name__ == '__main__':
    up(1)
    print("Directory is:")
    pprint(lib_path())
-   
+
    print("Calling upper directory:")
    up(2)
    pprint(lib_path())
-    

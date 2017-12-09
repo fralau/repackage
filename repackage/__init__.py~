@@ -56,9 +56,9 @@ import inspect
 
 def __caller():
     "Filename of the caller"
-    # you have to add 1 to the stack
+    # you have to add 2 to the stack
     try:
-        return inspect.stack()[2][1]
+        return inspect.stack()[3][1]
     except IndexError:
         # called from command line
         return ""

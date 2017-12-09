@@ -1,14 +1,21 @@
 ===================
-Package: Repackage 
+Package: Repackage
 ===================
 
 Laurent Franceschetti
-March/June 2013
+March/June 2013 - 2017
 MIT License.
 
 Purpose
 ===========
 This module allows any Python program to call a non-registered package in a reliable way. With this module, you may call "non-official" repositories, including with relative paths.
+
+**CAUTION:** *This form is an alternative to system of relative paths for
+python imports
+([PEP 328](https://www.python.org/dev/peps/pep-0328/#rationale-for-relative-imports))
+and as such it is largely redundant. It can, however, be interesting because
+it shows how such a problem could be solved.*
+
 
 Install
 =======
@@ -48,9 +55,9 @@ Both those methods have a flaw:
 
 The solution
 ============
-This package uses a simple strategy that is likely to work 
+This package uses a simple strategy that is likely to work
 in a good range of cases: it inspects the stack to determine which file
-is the caller and works out the relative path from there. 
+is the caller and works out the relative path from there.
 The only delicate part consisted in working out how many
 steps down the stack this is, but the answer should be invariant and
 can be computed both by reasoning and by trial and error (in this case: 3).
@@ -71,8 +78,8 @@ If it's two directories up, write:
 ::
 
   	import repackage
-	repackage.up(2)	
-	
+	repackage.up(2)
+
 Situation 2) Calling a non-registered directory somewhere else (absolute or relative path):
 ::
 
@@ -94,7 +101,7 @@ The method seems robust so far, but not all ins and outs
 have been explored. One precaution might be to ensure that the repackaging
 always points to the same source directory of a package
 (not to subdirectories of the same package), so as to avoid possible
-ambiguities in the lib path. (If this really turned out to be a problem, 
+ambiguities in the lib path. (If this really turned out to be a problem,
 this could be checked on the fly and a warning issued?).
 
 If you find bugs, or even find this approach useless, essentially flawed or against the Zen of Python, I will be glad to hear about it.
