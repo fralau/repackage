@@ -58,6 +58,10 @@ from os.path import dirname, abspath, normpath, join
 import inspect
 
 
+import os
+from distutils.spawn import find_executable
+
+
 
 
 def __caller():
@@ -126,18 +130,65 @@ def lib_path():
     return sys.path
 
 
+def _follow_link(filename):
+    "Check if file is symlink and if yes, follow to its end"
+    while os.path.islink(filename):
+        target = os.readlink(filename)
+        # if relative, complete:
+        if not os.path.isabs(target):
+            target = os.path.join(os.path.dirname(filename), target)
+        filename = target
+        # print("Follow link:", filename)
+    return filename
 
+def _which(exec_name):
+    """
+    Get the the executable referenced in the PATH ('which') .
+    If it is a symlink, it will follow it to its destination.
+    """
+    # 1. check in the PATH:
+    executable = find_executable(exec_name) or exec_name
+    # print("Executable:", executable)
+    # 2. check whether the exec_name is a symlink:
+    executable = _follow_link(executable)
+    return executable
 
+def add_path(module_filename):
+    """
+    Adds the directory of a module,
+    if the module can be found in the PATH.
+
+    It was designed to follow symlinks: if you have, in your PATH,
+    a symlink foo -> /my/dir/foo.py
+    (this gives an additional mechanism to the normal import paths of Python).
+
+    You should declare the module name as the filename that actually appears
+    in the path ('foo.py'; if a symlink, it might be 'foo')
+
+    This is tested for *NIX machines (Linux and MacOS).
+    """
+    dirname = os.path.dirname(_which(module_filename))
+    return add(dirname)
 
 # --------------------------------------------
 # Testing part
 # --------------------------------------------
 if __name__ == '__main__':
-   from pprint import pprint
-   up(1)
-   print("Directory is:")
-   pprint(lib_path())
+    from pprint import pprint
+    up(1)
+    print("Directory is:")
+    pprint(lib_path())
 
-   print("Calling upper directory:")
-   up(2)
-   pprint(lib_path())
+    print("Calling upper directory:")
+    up(2)
+    pprint(lib_path())
+
+    print("Adding the 'ls' module (supposing...)")
+    add_path('ls')
+    assert '/bin' in lib_path()
+
+
+    item = 'vi'
+    print("Adding the '%s' module (supposing...)" % item)
+    add_path('%s' % item)
+    print(lib_path()[0])

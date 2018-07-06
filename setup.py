@@ -5,7 +5,7 @@ from distutils.core import setup
 # Setup
 # -------------------------
 setup(name='repackage',
-      version='0.6',
+      version='0.7',
       description= ("Repackaging, call a non-registered package in any "
                     "directory (with relative call). "
                     "Used either by modules moved into to a subdirectory "

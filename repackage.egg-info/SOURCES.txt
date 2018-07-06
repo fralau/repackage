@@ -1,8 +1,0 @@
-README
-setup.py
-repackage/__init__.py
-repackage.egg-info/PKG-INFO
-repackage.egg-info/SOURCES.txt
-repackage.egg-info/dependency_links.txt
-repackage.egg-info/not-zip-safe
-repackage.egg-info/top_level.txt

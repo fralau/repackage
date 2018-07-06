@@ -1,7 +1,21 @@
 Package: Repackage
 ==================
 
-Laurent Franceschetti March/June 2013 - 2017 MIT License.
+Laurent Franceschetti March/June 2013 - 2018 MIT License.
+
+<!-- To update, run the following command: markdown-toc -i README.md -->
+
+<!-- toc -->
+
+- [Purpose](#purpose)
+- [Install](#install)
+- [The problem](#the-problem)
+- [The solution](#the-solution)
+- [Usage](#usage)
+- [Importing a module using the system PATH](#importing-a-module-using-the-system-path)
+- [Limitations](#limitations)
+
+<!-- tocstop -->
 
 Purpose
 -------
@@ -10,11 +24,10 @@ This module allows any Python program to call a non-registered package
 in a reliable way. With this module, you may call "non-official"
 repositories, including with relative paths.
 
-**CAUTION:** *This form is an alternative to system of relative paths
-for python imports (\[PEP
-328\](<https://www.python.org/dev/peps/pep-0328/#rationale-for-relative-imports>))
-and as such it is largely redundant. It can, however, be interesting
-because it shows how such a problem could be solved.*
+> **CAUTION:** *This form is an alternative to system of relative paths
+for python imports ([PEP
+328](<https://www.python.org/dev/peps/pep-0328/#rationale-for-relative-imports>)). It allows additional flexibility, at the cost of breaking some
+assumptions.*
 
 Install
 -------
@@ -22,6 +35,12 @@ Install
 If you are using pip: :
 
     pip install repackage
+
+Otherwise, download the package and type:
+
+```bash
+python setup.py install
+```
 
 The problem
 -----------
@@ -45,7 +64,7 @@ from a relative path?
 Two often advocated methods to determine the path are: a. from current
 directory or b. from \_\_FILE\_\_ .
 
-Both those methods have a flaw:  
+Both those methods have a flaw:
 -   The first does not take into account the file where the import is
     made, hence will fail if the project is using more than one
     directory.
@@ -78,17 +97,44 @@ pointing to the upper directory.
 
 If it's two directories up, write: :
 
-    import repackage
+
     repackage.up(2)
 
 Situation 2) Calling a non-registered directory somewhere else (absolute
 or relative path): :
 
-    import repackage
+
     repackage.add("../../otherdir")
 
 Clearly, repackage.up() would be equivalent to repackage.add("..") . I
 prefer the first because it is more terse and syntactically more robust.
+
+Importing a module using the system PATH
+--------------------------
+In some cases, it is convenient to install a Python app as a
+command in the PATH, usually with a symlink
+(e.g. `foo` => `/my/path/foo.py`).
+This allows us to execute it, regardless of
+where it is installed.
+
+The idea behind Python packages is more or less the same.
+
+> But what if
+the module is **not** part of a package? Wouldn't it be intuitive
+to exploit the PATH of the OS to import it?
+
+**This is possible.** Supposing `foo`is in the path, as a symlink to
+`my/path/foo.py`, then you can write:
+
+```Python
+repackage.add_path("foo")
+import foo
+```
+
+Repackage will follow the symlinks all the way to the destination
+and add the proper directory to your libpath. Needless to see, it
+would work also if there is no symlink (note that in this case,
+the file in your path might be called 'foo.py')
 
 Limitations
 -----------
